@@ -42,15 +42,35 @@ class Scanner
     when '*'
       add_token(TokenType::STAR)
     when '!'
-      add_token(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG)
+      add_token(match?('=') ? TokenType::BANG_EQUAL : TokenType::BANG)
     when '='
-      add_token(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL)
+      add_token(match?('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL)
     when '<'
-      add_token(match('=') ? TokenType::LESS_EQUAL : TokenType::LESS)
+      add_token(match?('=') ? TokenType::LESS_EQUAL : TokenType::LESS)
     when '>'
-      add_token(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER)
+      add_token(match?('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER)
+    when '/'
+      if match?('/')
+        # A comment goes until the end of the line.
+        while peek != '\n' && !at_end?
+          advance
+        end
+      else
+        add_token(TokenType::SLASH)
+      end
+    when ' '
+    when '\r'
+    when '\t'
+    when '\n'
+      @line += 1
+    when '"'
+      string
     else
-      Lox.error(@line, "Unexpected character.")
+      if digit?(char)
+        number
+      else
+        Lox.error(@line, "Unexpected character.")
+      end
     end
   end
 
@@ -73,7 +93,7 @@ class Scanner
     @tokens << Token.new(type, text, literal, @line)
   end
 
-  private def match(expected : Char)
+  private def match?(expected : Char)
     if at_end?
       false
     elsif @source[@current] != expected
@@ -81,6 +101,69 @@ class Scanner
     else
       @current += 1
       true
+    end
+  end
+
+  private def peek
+    if at_end?
+      '\0'
+    else
+      @source[@current]
+    end
+  end
+
+  private def string
+    while peek != '"' && !at_end?
+      if peek == '\n'
+        @line += 1
+      end
+
+      advance
+    end
+
+    if at_end?
+      Lox.error(@line, "Unterminated string.")
+      return
+    end
+
+    # The closing ".
+    advance
+
+    # Trim the surrounding quotes.
+    value = @source[@start + 1...@current - 1]
+    add_token(TokenType::STRING, value)
+  end
+
+  private def digit?(c : Char)
+    c >= '0' && c <= '9'
+  end
+
+  private def number
+    while digit?(peek)
+      advance
+    end
+
+    # Look for a fractional part.
+    if peek == '.' && digit?(peek_next)
+      # Consume the "."
+      advance
+
+      while digit?(peek)
+        advance
+      end
+    end
+
+    add_token(
+      TokenType::NUMBER,
+      @source[@start..@current].to_f
+    )
+  end
+
+  private def peek_next
+    if @current + 1 >= @source.size
+      '\0'
+    else
+      @source[@current + 1]
     end
   end
 end
