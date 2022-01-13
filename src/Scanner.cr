@@ -1,4 +1,23 @@
 class Scanner
+  KEYWORDS = {
+    "and"    => TokenType::AND,
+    "class"  => TokenType::CLASS,
+    "else"   => TokenType::ELSE,
+    "false"  => TokenType::FALSE,
+    "for"    => TokenType::FOR,
+    "fun"    => TokenType::FUN,
+    "if"     => TokenType::IF,
+    "nil"    => TokenType::NIL,
+    "or"     => TokenType::OR,
+    "print"  => TokenType::PRINT,
+    "return" => TokenType::RETURN,
+    "super"  => TokenType::SUPER,
+    "this"   => TokenType::THIS,
+    "true"   => TokenType::TRUE,
+    "var"    => TokenType::VAR,
+    "while"  => TokenType::WHILE,
+  }
+
   def initialize(@source : String)
     @tokens = [] of Token
 
@@ -19,7 +38,6 @@ class Scanner
 
   private def scan_token
     char = advance
-    p [:char, char]
     case char
     when '('
       add_token(TokenType::LEFT_PAREN)
@@ -68,6 +86,8 @@ class Scanner
     else
       if digit?(char)
         number
+      elsif alpha?(char)
+        identifier
       else
         Lox.error(@line, "Unexpected character.")
       end
@@ -89,7 +109,7 @@ class Scanner
   end
 
   private def add_token(type : TokenType, literal : Object)
-    text = @source[@start..@current]
+    text = @source[@start...@current]
     @tokens << Token.new(type, text, literal, @line)
   end
 
@@ -138,6 +158,16 @@ class Scanner
     c >= '0' && c <= '9'
   end
 
+  private def alpha?(c : Char)
+    (c >= 'a' && c <= 'z') ||
+      (c >= 'A' && c <= 'Z') ||
+      c == '_'
+  end
+
+  private def alphanumeric?(c : Char)
+    alpha?(c) || digit?(c)
+  end
+
   private def number
     while digit?(peek)
       advance
@@ -157,6 +187,16 @@ class Scanner
       TokenType::NUMBER,
       @source[@start..@current].to_f
     )
+  end
+
+  private def identifier
+    while alphanumeric?(peek)
+      advance
+    end
+
+    text = @source[@start...@current]
+    token_type = KEYWORDS.fetch(text, TokenType::IDENTIFIER)
+    add_token(token_type)
   end
 
   private def peek_next
