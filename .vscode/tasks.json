@@ -15,7 +15,13 @@
 		{
 			"label": "Run (debug)",
 			"type": "shell",
-			"command": "crystal run src/crystal-lox.cr"
+			"command": "crystal",
+			"args": [
+				"run",
+				"src/main.cr",
+				"--",
+				"examples/1.lox"
+			]
 		}
 	]
 }
