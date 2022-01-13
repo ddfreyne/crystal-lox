@@ -1,15 +1,17 @@
-require "./scanner"
+require "./Token"
+require "./TokenType"
+require "./Scanner"
 
 class Lox
   def initialize
     @had_error = false
   end
 
-  def report(line : Int32, where : String, message : String)
+  def self.report(line : Int32, where : String, message : String)
     STDERR.puts "[line #{line}] Error#{where}: #{message}"
   end
 
-  def error(line : Int32, message : String)
+  def self.error(line : Int32, message : String)
     report(line, "", message)
   end
 
