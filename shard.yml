@@ -1,0 +1,13 @@
+name: crystal-lox
+version: 0.1.0
+
+authors:
+  - Denis Defreyne <denis.defreyne@stoneship.org>
+
+targets:
+  crystal-lox:
+    main: src/crystal-lox.cr
+
+crystal: 1.3.0
+
+license: MIT
