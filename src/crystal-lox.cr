@@ -1,6 +1,5 @@
-# TODO: Write documentation for `Crystal::Lox`
-module Crystal::Lox
+module CrystalLox
   VERSION = "0.1.0"
-
-  # TODO: Put your code here
 end
+
+puts "Hello, world!"
