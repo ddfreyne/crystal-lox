@@ -1,27 +1,23 @@
 # crystal-lox
 
-TODO: Write a description here
+This is my implementation of [Lox](https://craftinginterpreters.com/the-lox-language.html) in Crystal, for my run-through through the book [Crafting Interpreters](https://craftinginterpreters.com/).
 
 ## Installation
 
-TODO: Write installation instructions here
+Don’t
 
 ## Usage
 
-TODO: Write usage instructions here
+No
 
 ## Development
 
-TODO: Write development instructions here
+Not for you
 
 ## Contributing
 
-1. Fork it (<https://github.com/your-github-user/crystal-lox/fork>)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+Avoid
 
 ## Contributors
 
-- [Denis Defreyne](https://github.com/your-github-user) - creator and maintainer
+Just me
