@@ -2,6 +2,8 @@ require "./Token"
 require "./TokenType"
 require "./Scanner"
 
+require "./Expr"
+
 class Lox
   def initialize
     @had_error = false
