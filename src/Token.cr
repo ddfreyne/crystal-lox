@@ -3,6 +3,6 @@ class Token
   end
 
   def to_s
-    [type, lexeme, literal].join(" ")
+    [@type, @lexeme, @literal || "null"].join(" ")
   end
 end

@@ -18,7 +18,7 @@ class Lox
   def run(source)
     scanner = Scanner.new(source)
     scanner.scan_tokens.each do |token|
-      p token
+      puts token.to_s
     end
   end
 
