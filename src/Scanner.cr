@@ -185,7 +185,7 @@ class Scanner
 
     add_token(
       TokenType::NUMBER,
-      @source[@start..@current].to_f
+      @source[@start..@current - 1].to_f
     )
   end
 
