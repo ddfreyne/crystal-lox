@@ -36,7 +36,7 @@
 			},
 			"args": [
 				"tool/bin/test.dart",
-				"chap06_parsing",
+				"chap07_evaluating",
 				"--interpreter",
 				"../crystal-lox/bin/crystal-lox"
 			]

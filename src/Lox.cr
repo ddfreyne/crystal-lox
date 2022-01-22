@@ -3,12 +3,16 @@ require "./TokenType"
 require "./Scanner"
 
 require "./Expr"
-require "./AstPrinter"
-
 require "./Parser"
+
+require "./AstPrinter"
+require "./Interpreter"
 
 class Lox
   @@had_error = false
+  @@had_runtime_error = false
+
+  @@interpreter = Interpreter.new
 
   def self.report(line : Int32, where : String, message : String)
     STDERR.puts "[line #{line}] Error#{where}: #{message}"
@@ -27,6 +31,12 @@ class Lox
     @@had_error = true
   end
 
+  def self.runtime_error(error : Interpreter::RuntimeError)
+    STDERR.puts(error.message)
+    STDERR.puts("[line #{error.token.line}]")
+    @@had_runtime_error = true
+  end
+
   def run(source)
     scanner = Scanner.new(source)
     tokens = scanner.scan_tokens
@@ -34,13 +44,12 @@ class Lox
     parser = Parser.new(tokens)
     expression = parser.parse
 
-    if @@had_error
+    if @@had_error || !expression
       return
     end
 
-    if expression
-      puts AstPrinter.new.visit(expression)
-    end
+    # puts AstPrinter.new.visit(expression)
+    @@interpreter.call(expression)
   end
 
   def run_prompt
@@ -55,9 +64,8 @@ class Lox
   def run_file(filename)
     run(File.read(filename))
 
-    if @@had_error
-      exit 65
-    end
+    exit 65 if @@had_error
+    exit 70 if @@had_runtime_error
   end
 
   def main

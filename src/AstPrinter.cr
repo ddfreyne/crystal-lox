@@ -21,16 +21,3 @@ class AstPrinter
     "(#{expr.operator.lexeme} #{visit(expr.right)})"
   end
 end
-
-# expr = Expr::Binary.new(
-#   Expr::Unary.new(
-#     Token.new(TokenType::MINUS, "-", nil, 1),
-#     Expr::Literal.new("123"),
-#   ),
-#   Token.new(TokenType::STAR, "*", nil, 1),
-#   Expr::Grouping.new(
-#     Expr::Literal.new("45.67")
-#   )
-# )
-#
-# puts AstPrinter.new.visit(expr)
