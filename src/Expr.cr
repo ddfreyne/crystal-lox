@@ -1,5 +1,6 @@
 abstract class Expr
   module Visitor
+    # TODO: rename these to end with _expr
     abstract def visit_binary(expr : Binary)
     abstract def visit_literal(expr : Literal)
     abstract def visit_grouping(expr : Grouping)

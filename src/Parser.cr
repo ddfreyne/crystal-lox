@@ -7,12 +7,36 @@ class Parser
   end
 
   def parse
-    expression
-  rescue
-    nil
+    statements = [] of Stmt
+
+    while !at_end?
+      statements << statement
+    end
+
+    statements
   end
 
   # expressions
+
+  private def statement
+    if match([TokenType::PRINT])
+      return print_statement
+    end
+
+    expression_statement
+  end
+
+  private def print_statement
+    value = expression
+    consume(TokenType::SEMICOLON, "Expected ';' after value.")
+    Stmt::Print.new(value)
+  end
+
+  private def expression_statement
+    expr = expression
+    consume(TokenType::SEMICOLON, "Expected ';' after value.")
+    Stmt::Expression.new(expr)
+  end
 
   private def expression
     equality

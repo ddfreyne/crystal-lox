@@ -3,6 +3,7 @@ require "./TokenType"
 require "./Scanner"
 
 require "./Expr"
+require "./Stmt"
 require "./Parser"
 
 require "./AstPrinter"
@@ -42,14 +43,14 @@ class Lox
     tokens = scanner.scan_tokens
 
     parser = Parser.new(tokens)
-    expression = parser.parse
+    stmts = parser.parse
 
-    if @@had_error || !expression
+    if @@had_error
       return
     end
 
     # puts AstPrinter.new.visit(expression)
-    @@interpreter.call(expression)
+    @@interpreter.interpret(stmts)
   end
 
   def run_prompt

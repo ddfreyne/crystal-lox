@@ -1,5 +1,6 @@
 class Interpreter
   include Expr::Visitor
+  include Stmt::Visitor
 
   class RuntimeError < Exception
     getter token
@@ -9,9 +10,10 @@ class Interpreter
     end
   end
 
-  def call(expr : Expr)
-    value = visit(expr)
-    puts(stringify(value))
+  def interpret(stmts : Array(Stmt))
+    stmts.each do |stmt|
+      execute(stmt)
+    end
   rescue err
     if err.is_a?(RuntimeError)
       Lox.runtime_error(err)
@@ -20,14 +22,28 @@ class Interpreter
     end
   end
 
-  # NOTE: known as #evaluate in jlox
-  def visit(expr : Expr)
+  def execute(stmt : Stmt)
+    stmt.accept(self)
+  end
+
+  def evaluate(expr : Expr)
     expr.accept(self)
   end
 
+  def visit_print_stmt(stmt : Stmt::Print) : Void
+    value = evaluate(stmt.expression)
+    puts(stringify(value))
+    nil # TODO: verify
+  end
+
+  def visit_expression_stmt(stmt : Stmt::Expression) : Void
+    evaluate(stmt.expression)
+    nil # TODO: verify
+  end
+
   def visit_binary(expr : Expr::Binary)
-    left = visit(expr.left)
-    right = visit(expr.right)
+    left = evaluate(expr.left)
+    right = evaluate(expr.right)
 
     case expr.operator.type
     when TokenType::PLUS
@@ -90,7 +106,7 @@ class Interpreter
   end
 
   def visit_grouping(expr : Expr::Grouping)
-    visit(expr.expr)
+    evaluate(expr.expr)
   end
 
   def visit_literal(expr : Expr::Literal)
@@ -98,7 +114,7 @@ class Interpreter
   end
 
   def visit_unary(expr : Expr::Unary)
-    right = visit(expr.right)
+    right = evaluate(expr.right)
 
     case expr.operator.type
     when TokenType::MINUS
