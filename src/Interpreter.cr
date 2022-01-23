@@ -10,6 +10,10 @@ class Interpreter
     end
   end
 
+  def initialize
+    @environment = Environment.new
+  end
+
   def interpret(stmts : Array(Stmt))
     stmts.each do |stmt|
       execute(stmt)
@@ -40,7 +44,13 @@ class Interpreter
   end
 
   def visit_var_stmt(stmt : Stmt::Var) : Void
-    # TODO
+    value = nil
+    initializer = stmt.initializer
+    if initializer
+      value = evaluate(initializer)
+    end
+
+    @environment.define(stmt.name.lexeme, value)
   end
 
   def visit_binary(expr : Expr::Binary)
@@ -137,8 +147,7 @@ class Interpreter
   end
 
   def visit_variable(expr : Expr::Variable)
-    # TODO
-    nil
+    @environment.get(expr.name)
   end
 
   private def truthy?(value)

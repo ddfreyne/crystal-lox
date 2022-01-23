@@ -6,6 +6,7 @@ require "./Expr"
 require "./Stmt"
 require "./Parser"
 
+require "./Environment"
 require "./Interpreter"
 
 class Lox
