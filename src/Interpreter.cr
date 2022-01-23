@@ -53,6 +53,12 @@ class Interpreter
     @environment.define(stmt.name.lexeme, value)
   end
 
+  def visit_assign(expr : Expr::Assign)
+    value = evaluate(expr.value)
+    @environment.assign(expr.name, value)
+    value
+  end
+
   def visit_binary(expr : Expr::Binary)
     left = evaluate(expr.left)
     right = evaluate(expr.right)

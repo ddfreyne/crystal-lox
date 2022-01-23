@@ -17,6 +17,7 @@ class Lox
 
   def self.report(line : Int32, where : String, message : String)
     STDERR.puts "[line #{line}] Error#{where}: #{message}"
+    @@had_error = true
   end
 
   def self.error(token : Token, message : String)
@@ -29,7 +30,6 @@ class Lox
 
   def self.error(line : Int32, message : String)
     report(line, "", message)
-    @@had_error = true
   end
 
   def self.runtime_error(error : Interpreter::RuntimeError)

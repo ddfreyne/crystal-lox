@@ -1,6 +1,7 @@
 abstract class Expr
   module Visitor
     # TODO: rename these to end with _expr
+    abstract def visit_assign(expr : Assign)
     abstract def visit_binary(expr : Binary)
     abstract def visit_literal(expr : Literal)
     abstract def visit_grouping(expr : Grouping)
@@ -9,6 +10,18 @@ abstract class Expr
   end
 
   abstract def accept(visitor : Visitor)
+
+  class Assign < Expr
+    getter name
+    getter value
+
+    def initialize(@name : Token, @value : Expr)
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_assign(self)
+    end
+  end
 
   class Binary < Expr
     getter left

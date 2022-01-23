@@ -60,7 +60,28 @@ class Parser
   end
 
   private def expression : Expr
-    equality
+    assignment
+  end
+
+  private def assignment : Expr
+    expr = equality
+
+    if match([TokenType::EQUAL])
+      equals = previous
+      value = assignment
+
+      case expr
+      when Expr::Variable
+        return Expr::Assign.new(expr.name, value)
+      else
+        # We report an error if the left-hand side isn’t a valid assignment
+        # target, but we don’t throw it because the parser isn’t in a confused
+        # state where we need to go into panic mode and synchronize.
+        error(equals, "Invalid assignment target.")
+      end
+    end
+
+    expr
   end
 
   private def equality : Expr

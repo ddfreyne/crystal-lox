@@ -10,4 +10,7 @@ print a + b;
 
 var zeep = 9000;
 print zeep;
+zeep = 9001;
+print zeep;
+
 print zoop;
