@@ -10,7 +10,10 @@ class Parser
     statements = [] of Stmt
 
     while !at_end?
-      statements << declaration
+      stmt = declaration
+      if stmt
+        statements << stmt
+      end
     end
 
     statements
@@ -18,13 +21,15 @@ class Parser
 
   # expressions
 
-  private def declaration : Stmt
+  private def declaration : Stmt | Nil
     if match([TokenType::VAR])
       return var_declaration
     end
 
     statement
-    # TODO: synchronize
+  rescue
+    synchronize
+    nil
   end
 
   private def var_declaration : Stmt
@@ -216,5 +221,34 @@ class Parser
     ParseError.new
   end
 
-  # TODO: private def synchronize
+  private def synchronize : Void
+    advance
+
+    while !at_end?
+      if previous.type == TokenType::SEMICOLON
+        return
+      end
+
+      case peek.type
+      when TokenType::CLASS
+        return
+      when TokenType::FUN
+        return
+      when TokenType::VAR
+        return
+      when TokenType::FOR
+        return
+      when TokenType::IF
+        return
+      when TokenType::WHILE
+        return
+      when TokenType::PRINT
+        return
+      when TokenType::RETURN
+        return
+      end
+
+      advance
+    end
+  end
 end

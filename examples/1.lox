@@ -3,10 +3,11 @@ print true;
 print 2 + 1;
 print (5 - (3 - 1)) + -1;
 
-
+ fff ffkk ;
 var a = 1;
 var b = 2;
 print a + b;
+1 + 2 = 4;
 
 var zeep = 9000;
 print zeep;
