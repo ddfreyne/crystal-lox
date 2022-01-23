@@ -20,7 +20,7 @@
 				"run",
 				"src/main.cr",
 				"--",
-				"examples/1.lox"
+				"examples/2.lox"
 			]
 		},
 		{
@@ -36,7 +36,7 @@
 			},
 			"args": [
 				"tool/bin/test.dart",
-				"chap07_evaluating",
+				"chap08_statements",
 				"--interpreter",
 				"../crystal-lox/bin/crystal-lox"
 			]

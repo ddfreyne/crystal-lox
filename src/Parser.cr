@@ -33,14 +33,14 @@ class Parser
   end
 
   private def var_declaration : Stmt
-    name = consume(TokenType::IDENTIFIER, "Expected variable name.")
+    name = consume(TokenType::IDENTIFIER, "Expect variable name.")
 
     initializer = nil
     if match([TokenType::EQUAL])
       initializer = expression
     end
 
-    consume(TokenType::SEMICOLON, "Expected ';' after variable declaration.")
+    consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.")
     Stmt::Var.new(name, initializer)
   end
 
@@ -49,18 +49,22 @@ class Parser
       return print_statement
     end
 
+    if match([TokenType::LEFT_BRACE])
+      return Stmt::Block.new(block)
+    end
+
     expression_statement
   end
 
   private def print_statement : Stmt
     value = expression
-    consume(TokenType::SEMICOLON, "Expected ';' after value.")
+    consume(TokenType::SEMICOLON, "Expect ';' after value.")
     Stmt::Print.new(value)
   end
 
   private def expression_statement : Stmt
     expr = expression
-    consume(TokenType::SEMICOLON, "Expected ';' after value.")
+    consume(TokenType::SEMICOLON, "Expect ';' after value.")
     Stmt::Expression.new(expr)
   end
 
@@ -160,10 +164,10 @@ class Parser
       Expr::Variable.new(previous)
     elsif match([TokenType::LEFT_PAREN])
       expr = expression
-      consume(TokenType::RIGHT_PAREN, "Expected ')' after expression.")
+      consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.")
       Expr::Grouping.new(expr)
     else
-      raise error(peek, "Expected expression.")
+      raise error(peek, "Expect expression.")
     end
   end
 
@@ -250,5 +254,20 @@ class Parser
 
       advance
     end
+  end
+
+  private def block : Array(Stmt)
+    stmts = [] of Stmt
+
+    while !check(TokenType::RIGHT_BRACE) && !at_end?
+      stmt = declaration
+      if stmt
+        stmts << stmt
+      end
+    end
+
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after block.")
+
+    stmts
   end
 end

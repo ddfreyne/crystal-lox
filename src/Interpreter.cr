@@ -34,6 +34,25 @@ class Interpreter
     expr.accept(self)
   end
 
+  # visitor - statements
+
+  def visit_block_stmt(stmt : Stmt::Block) : Void
+    execute_block(stmt.stmts, Environment.new(@environment))
+  end
+
+  private def execute_block(stmts : Array(Stmt), environment : Environment)
+    previous_environment = @environment
+    @environment = environment
+
+    begin
+      stmts.each do |stmt|
+        execute(stmt)
+      end
+    ensure
+      @environment = previous_environment
+    end
+  end
+
   def visit_print_stmt(stmt : Stmt::Print) : Void
     value = evaluate(stmt.expression)
     puts(stringify(value))
@@ -53,6 +72,8 @@ class Interpreter
     @environment.define(stmt.name.lexeme, value)
   end
 
+  # visitor - expression
+
   def visit_assign(expr : Expr::Assign)
     value = evaluate(expr.value)
     @environment.assign(expr.name, value)
@@ -70,49 +91,49 @@ class Interpreter
       elsif left.is_a?(String) && right.is_a?(String)
         left + right
       else
-        raise RuntimeError.new(expr.operator, "Operands must be numbers or strings")
+        raise RuntimeError.new(expr.operator, "Operands must be two numbers or two strings.")
       end
     when TokenType::MINUS
       if left.is_a?(Float64) && right.is_a?(Float64)
         left - right
       else
-        raise RuntimeError.new(expr.operator, "Operands must be numbers")
+        raise RuntimeError.new(expr.operator, "Operands must be numbers.")
       end
     when TokenType::SLASH
       if left.is_a?(Float64) && right.is_a?(Float64)
         left / right
       else
-        raise RuntimeError.new(expr.operator, "Operands must be numbers")
+        raise RuntimeError.new(expr.operator, "Operands must be numbers.")
       end
     when TokenType::STAR
       if left.is_a?(Float64) && right.is_a?(Float64)
         left * right
       else
-        raise RuntimeError.new(expr.operator, "Operands must be numbers")
+        raise RuntimeError.new(expr.operator, "Operands must be numbers.")
       end
     when TokenType::GREATER
       if left.is_a?(Float64) && right.is_a?(Float64)
         left > right
       else
-        raise RuntimeError.new(expr.operator, "Operands must be numbers")
+        raise RuntimeError.new(expr.operator, "Operands must be numbers.")
       end
     when TokenType::GREATER_EQUAL
       if left.is_a?(Float64) && right.is_a?(Float64)
         left >= right
       else
-        raise RuntimeError.new(expr.operator, "Operands must be numbers")
+        raise RuntimeError.new(expr.operator, "Operands must be numbers.")
       end
     when TokenType::LESS
       if left.is_a?(Float64) && right.is_a?(Float64)
         left < right
       else
-        raise RuntimeError.new(expr.operator, "Operands must be numbers")
+        raise RuntimeError.new(expr.operator, "Operands must be numbers.")
       end
     when TokenType::LESS_EQUAL
       if left.is_a?(Float64) && right.is_a?(Float64)
         left <= right
       else
-        raise RuntimeError.new(expr.operator, "Operands must be numbers")
+        raise RuntimeError.new(expr.operator, "Operands must be numbers.")
       end
     when TokenType::EQUAL_EQUAL
       equal?(left, right)
@@ -139,13 +160,13 @@ class Interpreter
       if right.is_a?(Float64)
         -right
       else
-        raise RuntimeError.new(expr.operator, "Operand must be a number")
+        raise RuntimeError.new(expr.operator, "Operand must be a number.")
       end
     when TokenType::BANG
       if right.is_a?(Bool)
         !truthy?(right)
       else
-        raise RuntimeError.new(expr.operator, "Operand must be a boolean")
+        raise RuntimeError.new(expr.operator, "Operand must be a boolean.")
       end
     else
       raise "Internal inconsistency error: unexpected token type #{expr.operator.type}"
@@ -155,6 +176,8 @@ class Interpreter
   def visit_variable(expr : Expr::Variable)
     @environment.get(expr.name)
   end
+
+  # utilities
 
   private def truthy?(value)
     case value

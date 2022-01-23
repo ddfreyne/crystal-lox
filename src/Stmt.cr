@@ -1,11 +1,23 @@
 abstract class Stmt
   module Visitor
+    abstract def visit_block_stmt(expr : Block) : Void
     abstract def visit_expression_stmt(expr : Expression) : Void
     abstract def visit_print_stmt(expr : Print) : Void
     abstract def visit_var_stmt(expr : Var) : Void
   end
 
   abstract def accept(visitor : Visitor)
+
+  class Block < Stmt
+    getter stmts
+
+    def initialize(@stmts : Array(Stmt))
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_block_stmt(self)
+    end
+  end
 
   class Expression < Stmt
     getter expression
