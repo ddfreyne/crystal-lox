@@ -33,12 +33,14 @@ class Interpreter
   def visit_print_stmt(stmt : Stmt::Print) : Void
     value = evaluate(stmt.expression)
     puts(stringify(value))
-    nil # TODO: verify
   end
 
   def visit_expression_stmt(stmt : Stmt::Expression) : Void
     evaluate(stmt.expression)
-    nil # TODO: verify
+  end
+
+  def visit_var_stmt(stmt : Stmt::Var) : Void
+    # TODO
   end
 
   def visit_binary(expr : Expr::Binary)
@@ -132,6 +134,11 @@ class Interpreter
     else
       raise "Internal inconsistency error: unexpected token type #{expr.operator.type}"
     end
+  end
+
+  def visit_variable(expr : Expr::Variable)
+    # TODO
+    nil
   end
 
   private def truthy?(value)

@@ -6,7 +6,6 @@ require "./Expr"
 require "./Stmt"
 require "./Parser"
 
-require "./AstPrinter"
 require "./Interpreter"
 
 class Lox
@@ -49,7 +48,6 @@ class Lox
       return
     end
 
-    # puts AstPrinter.new.visit(expression)
     @@interpreter.interpret(stmts)
   end
 

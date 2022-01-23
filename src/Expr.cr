@@ -5,6 +5,7 @@ abstract class Expr
     abstract def visit_literal(expr : Literal)
     abstract def visit_grouping(expr : Grouping)
     abstract def visit_unary(expr : Unary)
+    abstract def visit_variable(expr : Variable)
   end
 
   abstract def accept(visitor : Visitor)
@@ -53,6 +54,17 @@ abstract class Expr
 
     def accept(visitor : Visitor)
       visitor.visit_unary(self)
+    end
+  end
+
+  class Variable < Expr
+    getter name
+
+    def initialize(@name : Token)
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_variable(self)
     end
   end
 end

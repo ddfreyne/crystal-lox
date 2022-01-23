@@ -2,6 +2,7 @@ abstract class Stmt
   module Visitor
     abstract def visit_expression_stmt(expr : Expression) : Void
     abstract def visit_print_stmt(expr : Print) : Void
+    abstract def visit_var_stmt(expr : Var) : Void
   end
 
   abstract def accept(visitor : Visitor)
@@ -25,6 +26,18 @@ abstract class Stmt
 
     def accept(visitor : Visitor)
       visitor.visit_print_stmt(self)
+    end
+  end
+
+  class Var < Stmt
+    getter name
+    getter initializer
+
+    def initialize(@name : Token, @initializer : Expr | Nil)
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_var_stmt(self)
     end
   end
 end
