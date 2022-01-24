@@ -91,7 +91,7 @@ class Parser
   end
 
   private def assignment : Expr
-    expr = equality
+    expr = or
 
     if match([TokenType::EQUAL])
       equals = previous
@@ -106,6 +106,30 @@ class Parser
         # state where we need to go into panic mode and synchronize.
         error(equals, "Invalid assignment target.")
       end
+    end
+
+    expr
+  end
+
+  private def or : Expr
+    expr = and
+
+    while match([TokenType::OR])
+      operator = previous
+      right = and
+      expr = Expr::Logical.new(expr, operator, right)
+    end
+
+    expr
+  end
+
+  private def and : Expr
+    expr = equality
+
+    while match([TokenType::AND])
+      operator = previous
+      right = equality
+      expr = Expr::Logical.new(expr, operator, right)
     end
 
     expr
