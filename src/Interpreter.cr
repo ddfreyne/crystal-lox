@@ -83,6 +83,12 @@ class Interpreter
     @environment.define(stmt.name.lexeme, value)
   end
 
+  def visit_while_stmt(stmt : Stmt::While) : Void
+    while truthy?(evaluate(stmt.condition))
+      execute(stmt.body)
+    end
+  end
+
   # visitor - expression
 
   def visit_assign_expr(expr : Expr::Assign)

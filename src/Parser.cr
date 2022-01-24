@@ -53,6 +53,10 @@ class Parser
       return print_statement
     end
 
+    if match([TokenType::WHILE])
+      return while_statement
+    end
+
     if match([TokenType::LEFT_BRACE])
       return Stmt::Block.new(block)
     end
@@ -78,6 +82,16 @@ class Parser
     value = expression
     consume(TokenType::SEMICOLON, "Expect ';' after value.")
     Stmt::Print.new(value)
+  end
+
+  private def while_statement : Stmt
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.")
+    condition = expression
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after 'while'.")
+
+    body = statement
+
+    Stmt::While.new(condition, body)
   end
 
   private def expression_statement : Stmt

@@ -5,6 +5,7 @@ abstract class Stmt
     abstract def visit_if_stmt(expr : If) : Void
     abstract def visit_print_stmt(expr : Print) : Void
     abstract def visit_var_stmt(expr : Var) : Void
+    abstract def visit_while_stmt(expr : While) : Void
   end
 
   abstract def accept(visitor : Visitor)
@@ -64,6 +65,18 @@ abstract class Stmt
 
     def accept(visitor : Visitor)
       visitor.visit_var_stmt(self)
+    end
+  end
+
+  class While < Stmt
+    getter condition
+    getter body
+
+    def initialize(@condition : Expr, @body : Stmt)
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_while_stmt(self)
     end
   end
 end
