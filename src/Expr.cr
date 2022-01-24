@@ -1,12 +1,11 @@
 abstract class Expr
   module Visitor
-    # TODO: rename these to end with _expr
-    abstract def visit_assign(expr : Assign)
-    abstract def visit_binary(expr : Binary)
-    abstract def visit_literal(expr : Literal)
-    abstract def visit_grouping(expr : Grouping)
-    abstract def visit_unary(expr : Unary)
-    abstract def visit_variable(expr : Variable)
+    abstract def visit_assign_expr(expr : Assign)
+    abstract def visit_binary_expr(expr : Binary)
+    abstract def visit_literal_expr(expr : Literal)
+    abstract def visit_grouping_expr(expr : Grouping)
+    abstract def visit_unary_expr(expr : Unary)
+    abstract def visit_variable_expr(expr : Variable)
   end
 
   abstract def accept(visitor : Visitor)
@@ -19,7 +18,7 @@ abstract class Expr
     end
 
     def accept(visitor : Visitor)
-      visitor.visit_assign(self)
+      visitor.visit_assign_expr(self)
     end
   end
 
@@ -32,7 +31,7 @@ abstract class Expr
     end
 
     def accept(visitor : Visitor)
-      visitor.visit_binary(self)
+      visitor.visit_binary_expr(self)
     end
   end
 
@@ -43,7 +42,7 @@ abstract class Expr
     end
 
     def accept(visitor : Visitor)
-      visitor.visit_grouping(self)
+      visitor.visit_grouping_expr(self)
     end
   end
 
@@ -54,7 +53,7 @@ abstract class Expr
     end
 
     def accept(visitor : Visitor)
-      visitor.visit_literal(self)
+      visitor.visit_literal_expr(self)
     end
   end
 
@@ -66,7 +65,7 @@ abstract class Expr
     end
 
     def accept(visitor : Visitor)
-      visitor.visit_unary(self)
+      visitor.visit_unary_expr(self)
     end
   end
 
@@ -77,7 +76,7 @@ abstract class Expr
     end
 
     def accept(visitor : Visitor)
-      visitor.visit_variable(self)
+      visitor.visit_variable_expr(self)
     end
   end
 end

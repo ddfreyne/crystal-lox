@@ -74,13 +74,13 @@ class Interpreter
 
   # visitor - expression
 
-  def visit_assign(expr : Expr::Assign)
+  def visit_assign_expr(expr : Expr::Assign)
     value = evaluate(expr.value)
     @environment.assign(expr.name, value)
     value
   end
 
-  def visit_binary(expr : Expr::Binary)
+  def visit_binary_expr(expr : Expr::Binary)
     left = evaluate(expr.left)
     right = evaluate(expr.right)
 
@@ -144,15 +144,15 @@ class Interpreter
     end
   end
 
-  def visit_grouping(expr : Expr::Grouping)
+  def visit_grouping_expr(expr : Expr::Grouping)
     evaluate(expr.expr)
   end
 
-  def visit_literal(expr : Expr::Literal)
+  def visit_literal_expr(expr : Expr::Literal)
     expr.value
   end
 
-  def visit_unary(expr : Expr::Unary)
+  def visit_unary_expr(expr : Expr::Unary)
     right = evaluate(expr.right)
 
     case expr.operator.type
@@ -173,7 +173,7 @@ class Interpreter
     end
   end
 
-  def visit_variable(expr : Expr::Variable)
+  def visit_variable_expr(expr : Expr::Variable)
     @environment.get(expr.name)
   end
 
