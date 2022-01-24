@@ -45,6 +45,10 @@ class Parser
   end
 
   private def statement : Stmt
+    if match([TokenType::IF])
+      return if_statement
+    end
+
     if match([TokenType::PRINT])
       return print_statement
     end
@@ -54,6 +58,20 @@ class Parser
     end
 
     expression_statement
+  end
+
+  private def if_statement : Stmt
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'if'.")
+    condition = expression
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after 'if'.")
+
+    then_branch = statement
+    else_branch = nil
+    if match([TokenType::ELSE])
+      else_branch = statement
+    end
+
+    Stmt::If.new(condition, then_branch, else_branch)
   end
 
   private def print_statement : Stmt

@@ -2,6 +2,7 @@ abstract class Stmt
   module Visitor
     abstract def visit_block_stmt(expr : Block) : Void
     abstract def visit_expression_stmt(expr : Expression) : Void
+    abstract def visit_if_stmt(expr : If) : Void
     abstract def visit_print_stmt(expr : Print) : Void
     abstract def visit_var_stmt(expr : Var) : Void
   end
@@ -27,6 +28,19 @@ abstract class Stmt
 
     def accept(visitor : Visitor)
       visitor.visit_expression_stmt(self)
+    end
+  end
+
+  class If < Stmt
+    getter condition
+    getter then_branch
+    getter else_branch
+
+    def initialize(@condition : Expr, @then_branch : Stmt, @else_branch : Stmt | Nil)
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_if_stmt(self)
     end
   end
 

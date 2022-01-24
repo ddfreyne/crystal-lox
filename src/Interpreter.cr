@@ -53,6 +53,17 @@ class Interpreter
     end
   end
 
+  def visit_if_stmt(stmt : Stmt::If) : Void
+    if truthy?(evaluate(stmt.condition))
+      execute(stmt.then_branch)
+    else
+      else_branch = stmt.else_branch
+      if else_branch
+        execute(else_branch)
+      end
+    end
+  end
+
   def visit_print_stmt(stmt : Stmt::Print) : Void
     value = evaluate(stmt.expression)
     puts(stringify(value))
