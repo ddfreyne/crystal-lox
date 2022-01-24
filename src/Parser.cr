@@ -45,6 +45,10 @@ class Parser
   end
 
   private def statement : Stmt
+    if match([TokenType::FOR])
+      return for_statement
+    end
+
     if match([TokenType::IF])
       return if_statement
     end
@@ -62,6 +66,60 @@ class Parser
     end
 
     expression_statement
+  end
+
+  private def for_statement : Stmt
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.")
+
+    initializer =
+      if match([TokenType::SEMICOLON])
+        nil
+      elsif match([TokenType::VAR])
+        var_declaration
+      else
+        expression_statement
+      end
+
+    condition =
+      if check(TokenType::SEMICOLON)
+        nil
+      else
+        expression
+      end
+    consume(TokenType::SEMICOLON, "Expect ';' after loop condition.")
+
+    increment =
+      if check(TokenType::RIGHT_PAREN)
+        nil
+      else
+        expression
+      end
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.")
+
+    body = statement
+
+    if increment
+      body = Stmt::Block.new(
+        [
+          body,
+          Stmt::Expression.new(increment),
+        ]
+      )
+    end
+
+    condition ||= Expr::Literal.new(true)
+    body = Stmt::While.new(condition, body)
+
+    if initializer
+      body = Stmt::Block.new(
+        [
+          initializer,
+          body,
+        ]
+      )
+    end
+
+    body
   end
 
   private def if_statement : Stmt
