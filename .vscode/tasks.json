@@ -20,7 +20,7 @@
 				"run",
 				"src/main.cr",
 				"--",
-				"examples/3.lox"
+				"examples/4.lox"
 			]
 		},
 		{

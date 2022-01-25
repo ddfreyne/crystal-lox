@@ -1,13 +1,13 @@
 class Environment
   def initialize(@enclosing : Environment | Nil = nil)
-    @values = {} of String => String | Nil | Bool | Float64
+    @values = {} of String => String | Nil | Bool | Float64 | Callable
   end
 
-  def define(name : String, value : String | Nil | Bool | Float64)
+  def define(name : String, value : String | Nil | Bool | Float64 | Callable)
     @values[name] = value
   end
 
-  def assign(name : Token, value : String | Nil | Bool | Float64)
+  def assign(name : Token, value : String | Nil | Bool | Float64 | Callable)
     if @values.has_key?(name.lexeme)
       @values[name.lexeme] = value
     else
@@ -23,7 +23,7 @@ class Environment
     end
   end
 
-  def get(name : Token) : String | Nil | Bool | Float64
+  def get(name : Token) : String | Nil | Bool | Float64 | Callable
     @values.fetch(name.lexeme) do
       enclosing = @enclosing
       if enclosing

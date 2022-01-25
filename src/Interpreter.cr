@@ -11,7 +11,11 @@ class Interpreter
   end
 
   def initialize
-    @environment = Environment.new
+    globals = Environment.new
+
+    globals.define("clock", Callable::Builtin::Clock.new)
+
+    @environment = globals
   end
 
   def interpret(stmts : Array(Stmt))
@@ -30,7 +34,7 @@ class Interpreter
     stmt.accept(self)
   end
 
-  def evaluate(expr : Expr)
+  def evaluate(expr : Expr) : String | Nil | Bool | Float64 | Callable
     expr.accept(self)
   end
 
@@ -91,13 +95,13 @@ class Interpreter
 
   # visitor - expression
 
-  def visit_assign_expr(expr : Expr::Assign)
+  def visit_assign_expr(expr : Expr::Assign) : String | Nil | Bool | Float64 | Callable
     value = evaluate(expr.value)
     @environment.assign(expr.name, value)
     value
   end
 
-  def visit_binary_expr(expr : Expr::Binary)
+  def visit_binary_expr(expr : Expr::Binary) : String | Nil | Bool | Float64 | Callable
     left = evaluate(expr.left)
     right = evaluate(expr.right)
 
@@ -161,15 +165,15 @@ class Interpreter
     end
   end
 
-  def visit_grouping_expr(expr : Expr::Grouping)
+  def visit_grouping_expr(expr : Expr::Grouping) : String | Nil | Bool | Float64 | Callable
     evaluate(expr.expr)
   end
 
-  def visit_literal_expr(expr : Expr::Literal)
+  def visit_literal_expr(expr : Expr::Literal) : String | Nil | Bool | Float64 | Callable
     expr.value
   end
 
-  def visit_logical_expr(expr : Expr::Logical)
+  def visit_logical_expr(expr : Expr::Logical) : String | Nil | Bool | Float64 | Callable
     left = evaluate(expr.left)
 
     if expr.operator.type == TokenType::OR
@@ -183,7 +187,24 @@ class Interpreter
     evaluate(expr.right)
   end
 
-  def visit_unary_expr(expr : Expr::Unary)
+  def visit_call_expr(expr : Expr::Call) : String | Nil | Bool | Float64 | Callable
+    callee = evaluate(expr.callee)
+
+    arguments = expr.arguments.map { |arg| evaluate(arg) }
+
+    case callee
+    when Callable
+      if callee.arity != arguments.size
+        raise RuntimeError.new(expr.paren, "Expected #{callee.arity} arguments but got #{arguments.size}.")
+      end
+
+      callee.call(self, arguments)
+    else
+      raise RuntimeError.new(expr.paren, "Can only call functions and classes.")
+    end
+  end
+
+  def visit_unary_expr(expr : Expr::Unary) : String | Nil | Bool | Float64 | Callable
     right = evaluate(expr.right)
 
     case expr.operator.type
@@ -204,7 +225,7 @@ class Interpreter
     end
   end
 
-  def visit_variable_expr(expr : Expr::Variable)
+  def visit_variable_expr(expr : Expr::Variable) : String | Nil | Bool | Float64 | Callable
     @environment.get(expr.name)
   end
 
