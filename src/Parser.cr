@@ -22,6 +22,10 @@ class Parser
   # expressions
 
   private def declaration : Stmt | Nil
+    if match([TokenType::FUN])
+      return function("function")
+    end
+
     if match([TokenType::VAR])
       return var_declaration
     end
@@ -30,6 +34,33 @@ class Parser
   rescue
     synchronize
     nil
+  end
+
+  private def function(kind : String) : Stmt
+    # name
+    name = consume(TokenType::IDENTIFIER, "Expect #{kind} name.")
+
+    # parameters
+    consume(TokenType::LEFT_PAREN, "Expect '(' after #{kind} name.")
+    parameters = [] of Token
+    unless check(TokenType::RIGHT_PAREN)
+      parameters << consume(TokenType::IDENTIFIER, "Expect parameter name.")
+
+      while match([TokenType::COMMA])
+        if parameters.size >= 255
+          error(peek, "Can’t have more than 255 parameters.")
+        end
+
+        parameters << consume(TokenType::IDENTIFIER, "Expect parameter name.")
+      end
+    end
+    consume(TokenType::RIGHT_PAREN, "Expect '(' after #{kind} name.")
+
+    # body
+    consume(TokenType::LEFT_BRACE, "Expect '{' before #{kind} body.")
+    body = block
+
+    Stmt::Function.new(name, parameters, body)
   end
 
   private def var_declaration : Stmt

@@ -2,6 +2,8 @@ class Interpreter
   include Expr::Visitor
   include Stmt::Visitor
 
+  getter globals
+
   class RuntimeError < Exception
     getter token
 
@@ -11,7 +13,7 @@ class Interpreter
   end
 
   def initialize
-    globals = Environment.new
+    @globals = Environment.new
 
     globals.define("clock", Callable::Builtin::Clock.new)
 
@@ -44,7 +46,8 @@ class Interpreter
     execute_block(stmt.stmts, Environment.new(@environment))
   end
 
-  private def execute_block(stmts : Array(Stmt), environment : Environment)
+  # NOTE: Helper
+  def execute_block(stmts : Array(Stmt), environment : Environment)
     previous_environment = @environment
     @environment = environment
 
@@ -55,6 +58,15 @@ class Interpreter
     ensure
       @environment = previous_environment
     end
+  end
+
+  def visit_expression_stmt(stmt : Stmt::Expression) : Void
+    evaluate(stmt.expression)
+  end
+
+  def visit_function_stmt(stmt : Stmt::Function) : Void
+    function = LoxFunction.new(stmt)
+    @environment.define(stmt.name.lexeme, function)
   end
 
   def visit_if_stmt(stmt : Stmt::If) : Void
@@ -71,10 +83,6 @@ class Interpreter
   def visit_print_stmt(stmt : Stmt::Print) : Void
     value = evaluate(stmt.expression)
     puts(stringify(value))
-  end
-
-  def visit_expression_stmt(stmt : Stmt::Expression) : Void
-    evaluate(stmt.expression)
   end
 
   def visit_var_stmt(stmt : Stmt::Var) : Void
