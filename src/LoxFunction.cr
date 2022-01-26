@@ -1,7 +1,7 @@
 class LoxFunction
   include Callable
 
-  def initialize(@declaration : Stmt::Function)
+  def initialize(@declaration : Stmt::Function, @closure : Environment)
   end
 
   def arity : Int32
@@ -9,7 +9,7 @@ class LoxFunction
   end
 
   def call(interpreter : Interpreter, arguments : Array(String | Nil | Bool | Float64 | Callable))
-    environment = Environment.new(interpreter.globals)
+    environment = Environment.new(@closure)
     @declaration.params.zip(arguments) do |param, arg|
       environment.define(param.lexeme, arg)
     end

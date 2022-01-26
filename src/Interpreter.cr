@@ -65,7 +65,7 @@ class Interpreter
   end
 
   def visit_function_stmt(stmt : Stmt::Function) : Void
-    function = LoxFunction.new(stmt)
+    function = LoxFunction.new(stmt, @environment)
     @environment.define(stmt.name.lexeme, function)
   end
 
@@ -235,11 +235,7 @@ class Interpreter
         raise RuntimeError.new(expr.operator, "Operand must be a number.")
       end
     when TokenType::BANG
-      if right.is_a?(Bool)
-        !truthy?(right)
-      else
-        raise RuntimeError.new(expr.operator, "Operand must be a boolean.")
-      end
+      !truthy?(right)
     else
       raise "Internal inconsistency error: unexpected token type #{expr.operator.type}"
     end
