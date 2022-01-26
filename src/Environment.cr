@@ -1,4 +1,7 @@
 class Environment
+  getter enclosing
+  getter values
+
   def initialize(@enclosing : Environment | Nil = nil)
     @values = {} of String => String | Nil | Bool | Float64 | Callable
   end
@@ -35,5 +38,26 @@ class Environment
         )
       end
     end
+  end
+
+  def get_at(distance : Int32, name : String) : String | Nil | Bool | Float64 | Callable
+    ancestor(distance).values[name]
+  end
+
+  def assign_at(distance : Int32, name : Token, value : String | Nil | Bool | Float64 | Callable)
+    ancestor(distance).values[name.lexeme] = value
+  end
+
+  def ancestor(distance : Int32) : Environment
+    environment = self
+
+    distance.times do
+      enclosing = environment.enclosing
+      if enclosing
+        environment = enclosing
+      end
+    end
+
+    environment
   end
 end

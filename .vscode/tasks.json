@@ -36,7 +36,7 @@
 			},
 			"args": [
 				"tool/bin/test.dart",
-				"chap10_functions",
+				"chap11_resolving",
 				"--interpreter",
 				"../crystal-lox/bin/crystal-lox"
 			]

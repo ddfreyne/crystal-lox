@@ -10,6 +10,7 @@ require "./Callable"
 require "./Return"
 require "./LoxFunction"
 require "./Environment"
+require "./Resolver"
 require "./Interpreter"
 
 class Lox
@@ -47,10 +48,11 @@ class Lox
 
     parser = Parser.new(tokens)
     stmts = parser.parse
+    return if @@had_error
 
-    if @@had_error
-      return
-    end
+    resolver = Resolver.new(@@interpreter)
+    resolver.resolve(stmts)
+    return if @@had_error
 
     @@interpreter.interpret(stmts)
   end

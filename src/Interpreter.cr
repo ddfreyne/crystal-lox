@@ -18,6 +18,8 @@ class Interpreter
     globals.define("clock", Callable::Builtin::Clock.new)
 
     @environment = globals
+
+    @locals = {} of Expr => Int32
   end
 
   def interpret(stmts : Array(Stmt))
@@ -38,6 +40,10 @@ class Interpreter
 
   def evaluate(expr : Expr) : String | Nil | Bool | Float64 | Callable
     expr.accept(self)
+  end
+
+  def resolve(expr : Expr, depth : Int32)
+    @locals[expr] = depth
   end
 
   # visitor - statements
@@ -117,7 +123,14 @@ class Interpreter
 
   def visit_assign_expr(expr : Expr::Assign) : String | Nil | Bool | Float64 | Callable
     value = evaluate(expr.value)
-    @environment.assign(expr.name, value)
+
+    distance = @locals[expr]?
+    if distance
+      @environment.assign_at(distance, expr.name, value)
+    else
+      @globals.assign(expr.name, value)
+    end
+
     value
   end
 
@@ -242,7 +255,7 @@ class Interpreter
   end
 
   def visit_variable_expr(expr : Expr::Variable) : String | Nil | Bool | Float64 | Callable
-    @environment.get(expr.name)
+    look_up_variable(expr.name, expr)
   end
 
   # utilities
@@ -270,6 +283,15 @@ class Interpreter
       value.to_s.sub(/\.0$/, "")
     else
       value.to_s
+    end
+  end
+
+  private def look_up_variable(name : Token, expr : Expr)
+    distance = @locals[expr]?
+    if distance
+      @environment.get_at(distance, name.lexeme)
+    else
+      @globals.get(name)
     end
   end
 end
