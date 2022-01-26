@@ -1,6 +1,5 @@
 abstract class Stmt
   module Visitor
-    # TODO: rename expr to stmt
     abstract def visit_block_stmt(expr : Block) : Void
     abstract def visit_expression_stmt(expr : Expression) : Void
     abstract def visit_function_stmt(expr : Function) : Void
