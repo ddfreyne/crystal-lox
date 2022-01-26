@@ -7,6 +7,7 @@ require "./Stmt"
 require "./Parser"
 
 require "./Callable"
+require "./Return"
 require "./LoxFunction"
 require "./Environment"
 require "./Interpreter"

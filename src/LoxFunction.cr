@@ -14,7 +14,11 @@ class LoxFunction
       environment.define(param.lexeme, arg)
     end
 
-    interpreter.execute_block(@declaration.body, environment)
+    begin
+      interpreter.execute_block(@declaration.body, environment)
+    rescue ret : Return
+      return ret.value
+    end
   end
 
   def to_s

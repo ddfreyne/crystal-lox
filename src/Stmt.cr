@@ -1,10 +1,12 @@
 abstract class Stmt
   module Visitor
+    # TODO: rename expr to stmt
     abstract def visit_block_stmt(expr : Block) : Void
     abstract def visit_expression_stmt(expr : Expression) : Void
     abstract def visit_function_stmt(expr : Function) : Void
     abstract def visit_if_stmt(expr : If) : Void
     abstract def visit_print_stmt(expr : Print) : Void
+    abstract def visit_return_stmt(expr : Return) : Void
     abstract def visit_var_stmt(expr : Var) : Void
     abstract def visit_while_stmt(expr : While) : Void
   end
@@ -67,6 +69,18 @@ abstract class Stmt
 
     def accept(visitor : Visitor)
       visitor.visit_print_stmt(self)
+    end
+  end
+
+  class Return < Stmt
+    getter keyword
+    getter value
+
+    def initialize(@keyword : Token, @value : Expr | Nil)
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_return_stmt(self)
     end
   end
 

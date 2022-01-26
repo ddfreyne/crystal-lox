@@ -85,6 +85,18 @@ class Interpreter
     puts(stringify(value))
   end
 
+  def visit_return_stmt(stmt : Stmt::Return) : Void
+    value_expr = stmt.value
+    value =
+      if value_expr
+        evaluate(value_expr)
+      else
+        nil
+      end
+
+    raise Return.new(value)
+  end
+
   def visit_var_stmt(stmt : Stmt::Var) : Void
     value = nil
     initializer = stmt.initializer

@@ -48,13 +48,13 @@ class Parser
 
       while match([TokenType::COMMA])
         if parameters.size >= 255
-          error(peek, "Can’t have more than 255 parameters.")
+          error(peek, "Can't have more than 255 parameters.")
         end
 
         parameters << consume(TokenType::IDENTIFIER, "Expect parameter name.")
       end
     end
-    consume(TokenType::RIGHT_PAREN, "Expect '(' after #{kind} name.")
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.")
 
     # body
     consume(TokenType::LEFT_BRACE, "Expect '{' before #{kind} body.")
@@ -86,6 +86,10 @@ class Parser
 
     if match([TokenType::PRINT])
       return print_statement
+    end
+
+    if match([TokenType::RETURN])
+      return return_statement
     end
 
     if match([TokenType::WHILE])
@@ -173,6 +177,16 @@ class Parser
     Stmt::Print.new(value)
   end
 
+  private def return_statement : Stmt
+    keyword = previous
+    value = nil
+    if !check(TokenType::SEMICOLON)
+      value = expression
+    end
+    consume(TokenType::SEMICOLON, "Expect ';' after return value.")
+    Stmt::Return.new(keyword, value)
+  end
+
   private def while_statement : Stmt
     consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.")
     condition = expression
@@ -185,7 +199,7 @@ class Parser
 
   private def expression_statement : Stmt
     expr = expression
-    consume(TokenType::SEMICOLON, "Expect ';' after value.")
+    consume(TokenType::SEMICOLON, "Expect ';' after expression.")
     Stmt::Expression.new(expr)
   end
 
@@ -316,7 +330,7 @@ class Parser
       arguments << expression
       while match([TokenType::COMMA])
         if arguments.size >= 255
-          error(peek, "Can’t have more than 255 arguments.")
+          error(peek, "Can't have more than 255 arguments.")
         end
         arguments << expression
       end
