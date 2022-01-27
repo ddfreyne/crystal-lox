@@ -9,6 +9,10 @@ require "./Parser"
 require "./Callable"
 require "./Return"
 require "./LoxFunction"
+require "./LoxClass"
+
+alias LoxValue = String | Nil | Bool | Float64 | Callable | LoxClass
+
 require "./Environment"
 require "./Resolver"
 require "./Interpreter"

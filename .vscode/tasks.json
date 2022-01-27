@@ -13,15 +13,41 @@
 			}
 		},
 		{
+			"label": "Build (release)",
+			"type": "shell",
+			"command": "shards",
+			"args": ["build", "--release"],
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
 			"label": "Run (debug)",
 			"type": "shell",
-			"command": "crystal",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"command": "time",
 			"args": [
+				"crystal",
 				"run",
 				"src/main.cr",
 				"--",
-				"examples/5.lox"
+				"examples/6.lox"
 			]
+		},
+		{
+			"label": "Run (release)",
+			"type": "shell",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"command": "time",
+			"args": ["bin/crystal-lox", "examples/6.lox"]
 		},
 		{
 			"label": "Test",

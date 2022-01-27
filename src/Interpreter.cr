@@ -38,7 +38,7 @@ class Interpreter
     stmt.accept(self)
   end
 
-  def evaluate(expr : Expr) : String | Nil | Bool | Float64 | Callable
+  def evaluate(expr : Expr) : LoxValue
     expr.accept(self)
   end
 
@@ -50,6 +50,12 @@ class Interpreter
 
   def visit_block_stmt(stmt : Stmt::Block) : Void
     execute_block(stmt.stmts, Environment.new(@environment))
+  end
+
+  def visit_class_stmt(stmt : Stmt::Class) : Void
+    @environment.define(stmt.name.lexeme, nil)
+    klass = LoxClass.new(stmt.name.lexeme)
+    @environment.assign(stmt.name, klass)
   end
 
   # NOTE: Helper
@@ -121,7 +127,7 @@ class Interpreter
 
   # visitor - expression
 
-  def visit_assign_expr(expr : Expr::Assign) : String | Nil | Bool | Float64 | Callable
+  def visit_assign_expr(expr : Expr::Assign) : LoxValue
     value = evaluate(expr.value)
 
     distance = @locals[expr]?
@@ -134,7 +140,7 @@ class Interpreter
     value
   end
 
-  def visit_binary_expr(expr : Expr::Binary) : String | Nil | Bool | Float64 | Callable
+  def visit_binary_expr(expr : Expr::Binary) : LoxValue
     left = evaluate(expr.left)
     right = evaluate(expr.right)
 
@@ -198,15 +204,15 @@ class Interpreter
     end
   end
 
-  def visit_grouping_expr(expr : Expr::Grouping) : String | Nil | Bool | Float64 | Callable
+  def visit_grouping_expr(expr : Expr::Grouping) : LoxValue
     evaluate(expr.expr)
   end
 
-  def visit_literal_expr(expr : Expr::Literal) : String | Nil | Bool | Float64 | Callable
+  def visit_literal_expr(expr : Expr::Literal) : LoxValue
     expr.value
   end
 
-  def visit_logical_expr(expr : Expr::Logical) : String | Nil | Bool | Float64 | Callable
+  def visit_logical_expr(expr : Expr::Logical) : LoxValue
     left = evaluate(expr.left)
 
     if expr.operator.type == TokenType::OR
@@ -220,7 +226,7 @@ class Interpreter
     evaluate(expr.right)
   end
 
-  def visit_call_expr(expr : Expr::Call) : String | Nil | Bool | Float64 | Callable
+  def visit_call_expr(expr : Expr::Call) : LoxValue
     callee = evaluate(expr.callee)
 
     arguments = expr.arguments.map { |arg| evaluate(arg) }
@@ -237,7 +243,7 @@ class Interpreter
     end
   end
 
-  def visit_unary_expr(expr : Expr::Unary) : String | Nil | Bool | Float64 | Callable
+  def visit_unary_expr(expr : Expr::Unary) : LoxValue
     right = evaluate(expr.right)
 
     case expr.operator.type
@@ -254,7 +260,7 @@ class Interpreter
     end
   end
 
-  def visit_variable_expr(expr : Expr::Variable) : String | Nil | Bool | Float64 | Callable
+  def visit_variable_expr(expr : Expr::Variable) : LoxValue
     look_up_variable(expr.name, expr)
   end
 

@@ -1,6 +1,6 @@
 module Callable
   abstract def arity : Int32
-  abstract def call(interpreter : Interpreter, arguments : Array(String | Nil | Bool | Float64 | Callable))
+  abstract def call(interpreter : Interpreter, arguments : Array(LoxValue))
 
   module Builtin
     class Clock
@@ -10,7 +10,7 @@ module Callable
         0
       end
 
-      def call(interpreter : Interpreter, arguments : Array(String | Nil | Bool | Float64 | Callable))
+      def call(interpreter : Interpreter, arguments : Array(LoxValue))
         Time.local.to_unix_f
       end
 

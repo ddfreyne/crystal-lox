@@ -3,14 +3,14 @@ class Environment
   getter values
 
   def initialize(@enclosing : Environment | Nil = nil)
-    @values = {} of String => String | Nil | Bool | Float64 | Callable
+    @values = {} of String => LoxValue
   end
 
-  def define(name : String, value : String | Nil | Bool | Float64 | Callable)
+  def define(name : String, value : LoxValue)
     @values[name] = value
   end
 
-  def assign(name : Token, value : String | Nil | Bool | Float64 | Callable)
+  def assign(name : Token, value : LoxValue)
     if @values.has_key?(name.lexeme)
       @values[name.lexeme] = value
     else
@@ -26,7 +26,7 @@ class Environment
     end
   end
 
-  def get(name : Token) : String | Nil | Bool | Float64 | Callable
+  def get(name : Token) : LoxValue
     @values.fetch(name.lexeme) do
       enclosing = @enclosing
       if enclosing
@@ -40,11 +40,11 @@ class Environment
     end
   end
 
-  def get_at(distance : Int32, name : String) : String | Nil | Bool | Float64 | Callable
+  def get_at(distance : Int32, name : String) : LoxValue
     ancestor(distance).values[name]
   end
 
-  def assign_at(distance : Int32, name : Token, value : String | Nil | Bool | Float64 | Callable)
+  def assign_at(distance : Int32, name : Token, value : LoxValue)
     ancestor(distance).values[name.lexeme] = value
   end
 

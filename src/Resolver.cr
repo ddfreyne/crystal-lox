@@ -33,6 +33,13 @@ class Resolver
     nil
   end
 
+  def visit_class_stmt(stmt : Stmt::Class) : Void
+    declare(stmt.name)
+    define(stmt.name)
+
+    # TODO: declare/define methods
+  end
+
   def visit_expression_stmt(stmt : Stmt::Expression) : Void
     resolve(stmt.expression)
   end

@@ -8,7 +8,7 @@ class LoxFunction
     @declaration.params.size
   end
 
-  def call(interpreter : Interpreter, arguments : Array(String | Nil | Bool | Float64 | Callable))
+  def call(interpreter : Interpreter, arguments : Array(LoxValue))
     environment = Environment.new(@closure)
     @declaration.params.zip(arguments) do |param, arg|
       environment.define(param.lexeme, arg)

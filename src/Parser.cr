@@ -22,6 +22,10 @@ class Parser
   # expressions
 
   private def declaration : Stmt | Nil
+    if match([TokenType::CLASS])
+      return class_declaration
+    end
+
     if match([TokenType::FUN])
       return function("function")
     end
@@ -34,6 +38,19 @@ class Parser
   rescue
     synchronize
     nil
+  end
+
+  private def class_declaration
+    name = consume(TokenType::IDENTIFIER, "Expect class name.")
+    consume(TokenType::LEFT_BRACE, "Expect '{' before class body.")
+
+    methods = [] of Stmt::Function
+    while !check(TokenType::RIGHT_BRACE) && !at_end?
+      methods << function("method")
+    end
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.")
+
+    Stmt::Class.new(name, methods)
   end
 
   private def function(kind : String) : Stmt
