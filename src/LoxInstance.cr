@@ -5,6 +5,9 @@ class LoxInstance
 
   def get(name : Token)
     @fields.fetch(name.lexeme) do
+      method = @klass.find_method(name.lexeme)
+      return method if method
+
       raise Interpreter::RuntimeError.new(
         name,
         "Undefined property '#{name.lexeme}'."

@@ -54,7 +54,14 @@ class Interpreter
 
   def visit_class_stmt(stmt : Stmt::Class) : Void
     @environment.define(stmt.name.lexeme, nil)
-    klass = LoxClass.new(stmt.name.lexeme)
+
+    methods = {} of String => LoxFunction
+    stmt.methods.each do |method|
+      function = LoxFunction.new(method, @environment)
+      methods[method.name.lexeme] = function
+    end
+
+    klass = LoxClass.new(stmt.name.lexeme, methods)
     @environment.assign(stmt.name, klass)
   end
 

@@ -5,6 +5,7 @@ class Resolver
   enum FunctionType
     NONE
     FUNCTION
+    METHOD
   end
 
   def initialize(@interpreter : Interpreter)
@@ -37,7 +38,10 @@ class Resolver
     declare(stmt.name)
     define(stmt.name)
 
-    # TODO: declare/define methods
+    stmt.methods.each do |method|
+      declaration = FunctionType::METHOD
+      resolve_function(method, declaration)
+    end
   end
 
   def visit_expression_stmt(stmt : Stmt::Expression) : Void
