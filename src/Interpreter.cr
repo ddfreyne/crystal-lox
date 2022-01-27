@@ -204,6 +204,23 @@ class Interpreter
     end
   end
 
+  def visit_call_expr(expr : Expr::Call) : LoxValue
+    callee = evaluate(expr.callee)
+
+    arguments = expr.arguments.map { |arg| evaluate(arg) }
+
+    case callee
+    when Callable
+      if callee.arity != arguments.size
+        raise RuntimeError.new(expr.paren, "Expected #{callee.arity} arguments but got #{arguments.size}.")
+      end
+
+      callee.call(self, arguments)
+    else
+      raise RuntimeError.new(expr.paren, "Can only call functions and classes.")
+    end
+  end
+
   def visit_get_expr(expr : Expr::Get) : LoxValue
     object = evaluate(expr.object)
     if object.is_a?(LoxInstance)
@@ -233,24 +250,6 @@ class Interpreter
     end
 
     evaluate(expr.right)
-  end
-
-  # TODO: move up
-  def visit_call_expr(expr : Expr::Call) : LoxValue
-    callee = evaluate(expr.callee)
-
-    arguments = expr.arguments.map { |arg| evaluate(arg) }
-
-    case callee
-    when Callable
-      if callee.arity != arguments.size
-        raise RuntimeError.new(expr.paren, "Expected #{callee.arity} arguments but got #{arguments.size}.")
-      end
-
-      callee.call(self, arguments)
-    else
-      raise RuntimeError.new(expr.paren, "Can only call functions and classes.")
-    end
   end
 
   def visit_set_expr(expr : Expr::Set)
