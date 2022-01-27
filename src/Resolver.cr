@@ -106,16 +106,27 @@ class Resolver
     expr.arguments.each { |arg| resolve(arg) }
   end
 
+  # TODO: move down
   def visit_literal_expr(expr : Expr::Literal)
   end
 
+  # TODO: move down
   def visit_logical_expr(expr : Expr::Logical)
     resolve(expr.left)
     resolve(expr.right)
   end
 
+  def visit_get_expr(expr : Expr::Get)
+    resolve(expr.object)
+  end
+
   def visit_grouping_expr(expr : Expr::Grouping)
     resolve(expr.expr)
+  end
+
+  def visit_set_expr(expr : Expr::Set)
+    resolve(expr.value)
+    resolve(expr.object)
   end
 
   def visit_unary_expr(expr : Expr::Unary)

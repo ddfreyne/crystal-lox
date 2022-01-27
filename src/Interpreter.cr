@@ -204,6 +204,15 @@ class Interpreter
     end
   end
 
+  def visit_get_expr(expr : Expr::Get) : LoxValue
+    object = evaluate(expr.object)
+    if object.is_a?(LoxInstance)
+      return object.get(expr.name)
+    end
+
+    raise RuntimeError.new(expr.name, "Only instances have properties.")
+  end
+
   def visit_grouping_expr(expr : Expr::Grouping) : LoxValue
     evaluate(expr.expr)
   end
@@ -226,6 +235,7 @@ class Interpreter
     evaluate(expr.right)
   end
 
+  # TODO: move up
   def visit_call_expr(expr : Expr::Call) : LoxValue
     callee = evaluate(expr.callee)
 
@@ -241,6 +251,19 @@ class Interpreter
     else
       raise RuntimeError.new(expr.paren, "Can only call functions and classes.")
     end
+  end
+
+  def visit_set_expr(expr : Expr::Set)
+    object = evaluate(expr.object)
+
+    unless object.is_a?(LoxInstance)
+      raise RuntimeError.new(expr.name, "Only instances have fields.")
+    end
+
+    value = evaluate(expr.value)
+
+    object.set(expr.name, value)
+    value
   end
 
   def visit_unary_expr(expr : Expr::Unary) : LoxValue

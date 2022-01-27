@@ -3,9 +3,11 @@ abstract class Expr
     abstract def visit_assign_expr(expr : Assign)
     abstract def visit_binary_expr(expr : Binary)
     abstract def visit_call_expr(expr : Call)
+    abstract def visit_get_expr(expr : Get)
     abstract def visit_literal_expr(expr : Literal)
     abstract def visit_logical_expr(expr : Logical)
     abstract def visit_grouping_expr(expr : Grouping)
+    abstract def visit_set_expr(expr : Set)
     abstract def visit_unary_expr(expr : Unary)
     abstract def visit_variable_expr(expr : Variable)
   end
@@ -50,6 +52,18 @@ abstract class Expr
     end
   end
 
+  class Get < Expr
+    getter object
+    getter name
+
+    def initialize(@object : Expr, @name : Token)
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_get_expr(self)
+    end
+  end
+
   class Grouping < Expr
     getter expr
 
@@ -82,6 +96,19 @@ abstract class Expr
 
     def accept(visitor : Visitor)
       visitor.visit_logical_expr(self)
+    end
+  end
+
+  class Set < Expr
+    getter object
+    getter name
+    getter value
+
+    def initialize(@object : Expr, @name : Token, @value : Expr)
+    end
+
+    def accept(visitor : Visitor)
+      visitor.visit_set_expr(self)
     end
   end
 

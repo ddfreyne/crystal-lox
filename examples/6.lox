@@ -5,3 +5,13 @@ class DevonshireCream {
 }
 
 print DevonshireCream; // Prints "DevonshireCream".
+
+class Bagel {}
+var bagel = Bagel();
+print bagel; // Prints "Bagel instance".
+
+class Container {}
+var container = Container();
+container.width = 12;
+print container;
+print container.width;

@@ -234,6 +234,8 @@ class Parser
       case expr
       when Expr::Variable
         return Expr::Assign.new(expr.name, value)
+      when Expr::Get
+        return Expr::Set.new(expr.object, expr.name, value)
       else
         # We report an error if the left-hand side isn’t a valid assignment
         # target, but we don’t throw it because the parser isn’t in a confused
@@ -333,6 +335,9 @@ class Parser
     loop do
       if match([TokenType::LEFT_PAREN])
         expr = finish_call(expr)
+      elsif match([TokenType::DOT])
+        name = consume(TokenType::IDENTIFIER, "Expect property after '.'.")
+        expr = Expr::Get.new(expr, name)
       else
         break
       end

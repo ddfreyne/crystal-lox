@@ -10,8 +10,9 @@ require "./Callable"
 require "./Return"
 require "./LoxFunction"
 require "./LoxClass"
+require "./LoxInstance"
 
-alias LoxValue = String | Nil | Bool | Float64 | Callable | LoxClass
+alias LoxValue = String | Nil | Bool | Float64 | Callable | LoxInstance
 
 require "./Environment"
 require "./Resolver"
