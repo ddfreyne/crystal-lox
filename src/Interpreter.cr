@@ -67,17 +67,30 @@ class Interpreter
 
     @environment.define(stmt.name.lexeme, nil)
 
+    original_environment = @environment
+    if superclass
+      environment = Environment.new(@environment)
+      environment.define("super", superclass)
+    else
+      environment = @environment
+    end
+
     methods = {} of String => LoxFunction
     stmt.methods.each do |method|
       function = LoxFunction.new(
         method,
-        @environment,
+        environment,
         method.name.lexeme == "init"
       )
       methods[method.name.lexeme] = function
     end
 
     klass = LoxClass.new(stmt.name.lexeme, superclass, methods)
+
+    if superclass
+      environment = original_environment
+    end
+
     @environment.assign(stmt.name, klass)
   end
 
@@ -286,6 +299,27 @@ class Interpreter
 
     object.set(expr.name, value)
     value
+  end
+
+  def visit_super_expr(expr : Expr::Super)
+    distance = @locals[expr]
+
+    superclass = @environment.get_at(distance, "super")
+    unless superclass.is_a?(LoxClass)
+      raise "Internal inconsistency: 'super' is not a class"
+    end
+
+    object = @environment.get_at(distance - 1, "this")
+    unless object.is_a?(LoxInstance)
+      raise "Internal inconsistency: 'this' is not an instance"
+    end
+
+    method = superclass.find_method(expr.method.lexeme)
+    unless method
+      raise RuntimeError.new(expr.method, "Undefined property '#{expr.method.lexeme}'.")
+    end
+
+    method.bind(object)
   end
 
   def visit_this_expr(expr : Expr::This)

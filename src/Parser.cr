@@ -381,6 +381,11 @@ class Parser
       Expr::Literal.new(nil)
     elsif match([TokenType::NUMBER, TokenType::STRING])
       Expr::Literal.new(previous.literal)
+    elsif match([TokenType::SUPER])
+      keyword = previous
+      consume(TokenType::DOT, "Expect '.' after 'super'.")
+      method = consume(TokenType::IDENTIFIER, "Expect superclass method name.")
+      Expr::Super.new(keyword, method)
     elsif match([TokenType::THIS])
       Expr::This.new(previous)
     elsif match([TokenType::IDENTIFIER])
@@ -416,6 +421,7 @@ class Parser
     peek.type == TokenType::EOF
   end
 
+  # TODO: add match(TokenType) override
   private def match(token_types : Array(TokenType)) : Bool
     token_types.each do |token_type|
       if check(token_type)

@@ -41,7 +41,7 @@ class Environment
   end
 
   def get_at(distance : Int32, name : String) : LoxValue
-    ancestor(distance).values[name]
+    ancestor(distance).values[name]?
   end
 
   def assign_at(distance : Int32, name : Token, value : LoxValue)

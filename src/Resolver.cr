@@ -58,6 +58,11 @@ class Resolver
       resolve(superclass)
     end
 
+    if superclass
+      begin_scope
+      @scopes.last["super"] = true
+    end
+
     begin_scope
     @scopes.last["this"] = true
 
@@ -71,6 +76,10 @@ class Resolver
     end
 
     end_scope
+
+    if superclass
+      end_scope
+    end
 
     @current_class_type = enclosing_class_type
   end
@@ -164,6 +173,10 @@ class Resolver
   def visit_set_expr(expr : Expr::Set)
     resolve(expr.value)
     resolve(expr.object)
+  end
+
+  def visit_super_expr(expr : Expr::Super)
+    resolve_local(expr, expr.keyword)
   end
 
   def visit_this_expr(expr : Expr::This)
