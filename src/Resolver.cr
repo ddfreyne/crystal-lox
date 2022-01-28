@@ -12,6 +12,7 @@ class Resolver
   enum ClassType
     NONE
     CLASS
+    SUBCLASS
   end
 
   def initialize(@interpreter : Interpreter)
@@ -55,6 +56,7 @@ class Resolver
     end
 
     if superclass
+      @current_class_type = ClassType::SUBCLASS
       resolve(superclass)
     end
 
@@ -176,6 +178,14 @@ class Resolver
   end
 
   def visit_super_expr(expr : Expr::Super)
+    if @current_class_type == ClassType::NONE
+      Lox.error(expr.keyword, "Can't use 'super' outside of a class.")
+    end
+
+    if @current_class_type == ClassType::SUBCLASS
+      Lox.error(expr.keyword, "Can't use 'super' in a class with no superclass.")
+    end
+
     resolve_local(expr, expr.keyword)
   end
 
