@@ -5,12 +5,19 @@ class Resolver
   enum FunctionType
     NONE
     FUNCTION
+    INITIALIZER
     METHOD
+  end
+
+  enum ClassType
+    NONE
+    CLASS
   end
 
   def initialize(@interpreter : Interpreter)
     @scopes = [] of Hash(String, Bool)
     @current_function_type = FunctionType::NONE
+    @current_class_type = ClassType::NONE
   end
 
   def resolve(stmts : Array(Stmt))
@@ -35,13 +42,27 @@ class Resolver
   end
 
   def visit_class_stmt(stmt : Stmt::Class) : Void
+    enclosing_class_type = @current_class_type
+    @current_class_type = ClassType::CLASS
+
     declare(stmt.name)
     define(stmt.name)
 
+    begin_scope
+    @scopes.last["this"] = true
+
     stmt.methods.each do |method|
       declaration = FunctionType::METHOD
+      if method.name.lexeme == "init"
+        declaration = FunctionType::INITIALIZER
+      end
+
       resolve_function(method, declaration)
     end
+
+    end_scope
+
+    @current_class_type = enclosing_class_type
   end
 
   def visit_expression_stmt(stmt : Stmt::Expression) : Void
@@ -75,6 +96,10 @@ class Resolver
 
     value = stmt.value
     if value
+      if @current_function_type == FunctionType::INITIALIZER
+        Lox.error(stmt.keyword, "Can't return a value from an initializer.")
+      end
+
       resolve(value)
     end
   end
@@ -129,6 +154,15 @@ class Resolver
   def visit_set_expr(expr : Expr::Set)
     resolve(expr.value)
     resolve(expr.object)
+  end
+
+  def visit_this_expr(expr : Expr::This)
+    if @current_class_type == ClassType::NONE
+      Lox.error(expr.keyword, "Can't use 'this' outside of a class.")
+      return
+    end
+
+    resolve_local(expr, expr.keyword)
   end
 
   def visit_unary_expr(expr : Expr::Unary)

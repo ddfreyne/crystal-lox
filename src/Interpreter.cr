@@ -57,7 +57,11 @@ class Interpreter
 
     methods = {} of String => LoxFunction
     stmt.methods.each do |method|
-      function = LoxFunction.new(method, @environment)
+      function = LoxFunction.new(
+        method,
+        @environment,
+        method.name.lexeme == "init"
+      )
       methods[method.name.lexeme] = function
     end
 
@@ -84,7 +88,7 @@ class Interpreter
   end
 
   def visit_function_stmt(stmt : Stmt::Function) : Void
-    function = LoxFunction.new(stmt, @environment)
+    function = LoxFunction.new(stmt, @environment, false)
     @environment.define(stmt.name.lexeme, function)
   end
 
@@ -270,6 +274,10 @@ class Interpreter
 
     object.set(expr.name, value)
     value
+  end
+
+  def visit_this_expr(expr : Expr::This)
+    look_up_variable(expr.keyword, expr)
   end
 
   def visit_unary_expr(expr : Expr::Unary) : LoxValue

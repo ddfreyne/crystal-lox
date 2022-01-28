@@ -336,7 +336,7 @@ class Parser
       if match([TokenType::LEFT_PAREN])
         expr = finish_call(expr)
       elsif match([TokenType::DOT])
-        name = consume(TokenType::IDENTIFIER, "Expect property after '.'.")
+        name = consume(TokenType::IDENTIFIER, "Expect property name after '.'.")
         expr = Expr::Get.new(expr, name)
       else
         break
@@ -372,6 +372,8 @@ class Parser
       Expr::Literal.new(nil)
     elsif match([TokenType::NUMBER, TokenType::STRING])
       Expr::Literal.new(previous.literal)
+    elsif match([TokenType::THIS])
+      Expr::This.new(previous)
     elsif match([TokenType::IDENTIFIER])
       Expr::Variable.new(previous)
     elsif match([TokenType::LEFT_PAREN])

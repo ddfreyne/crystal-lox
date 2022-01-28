@@ -8,11 +8,22 @@ class LoxClass
   end
 
   def arity : Int32
-    0
+    initializer = find_method("init")
+    if initializer
+      initializer.arity
+    else
+      0
+    end
   end
 
   def call(interpreter : Interpreter, arguments : Array(LoxValue))
     instance = LoxInstance.new(self)
+
+    initializer = find_method("init")
+    if initializer
+      initializer.bind(instance).call(interpreter, arguments)
+    end
+
     instance
   end
 
