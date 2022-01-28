@@ -4,7 +4,7 @@ class LoxClass
   getter name
   getter methods
 
-  def initialize(@name : String, @methods : Hash(String, LoxFunction))
+  def initialize(@name : String, @superclass : LoxClass | Nil, @methods : Hash(String, LoxFunction))
   end
 
   def arity : Int32
@@ -28,7 +28,15 @@ class LoxClass
   end
 
   def find_method(name : String) : LoxFunction | Nil
-    @methods[name]?
+    candidate = @methods[name]?
+    return candidate if candidate
+
+    superclass = @superclass
+    if superclass
+      return superclass.find_method(name)
+    end
+
+    nil
   end
 
   def to_s

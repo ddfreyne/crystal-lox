@@ -48,6 +48,16 @@ class Resolver
     declare(stmt.name)
     define(stmt.name)
 
+    superclass = stmt.superclass
+
+    if superclass && stmt.name.lexeme == superclass.name.lexeme
+      Lox.error(superclass.name, "A class can't inherit from itself")
+    end
+
+    if superclass
+      resolve(superclass)
+    end
+
     begin_scope
     @scopes.last["this"] = true
 

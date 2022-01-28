@@ -53,6 +53,18 @@ class Interpreter
   end
 
   def visit_class_stmt(stmt : Stmt::Class) : Void
+    superclass_expr = stmt.superclass
+    superclass = nil
+
+    if superclass_expr
+      superclass_candidate = evaluate(superclass_expr)
+      if !superclass_candidate.is_a?(LoxClass)
+        raise RuntimeError.new(superclass_expr.name, "Superclass must be a class.")
+      else
+        superclass = superclass_candidate
+      end
+    end
+
     @environment.define(stmt.name.lexeme, nil)
 
     methods = {} of String => LoxFunction
@@ -65,7 +77,7 @@ class Interpreter
       methods[method.name.lexeme] = function
     end
 
-    klass = LoxClass.new(stmt.name.lexeme, methods)
+    klass = LoxClass.new(stmt.name.lexeme, superclass, methods)
     @environment.assign(stmt.name, klass)
   end
 
