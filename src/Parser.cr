@@ -432,10 +432,7 @@ class Parser
 
   private def match(token_types : Array(TokenType)) : Bool
     token_types.each do |token_type|
-      if check(token_type)
-        advance
-        return true
-      end
+      return true if match(token_type)
     end
 
     false
