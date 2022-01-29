@@ -22,15 +22,15 @@ class Parser
   # expressions
 
   private def declaration : Stmt | Nil
-    if match([TokenType::CLASS])
+    if match(TokenType::CLASS)
       return class_declaration
     end
 
-    if match([TokenType::FUN])
+    if match(TokenType::FUN)
       return function("function")
     end
 
-    if match([TokenType::VAR])
+    if match(TokenType::VAR)
       return var_declaration
     end
 
@@ -44,7 +44,7 @@ class Parser
     name = consume(TokenType::IDENTIFIER, "Expect class name.")
 
     superclass =
-      if match([TokenType::LESS])
+      if match(TokenType::LESS)
         consume(TokenType::IDENTIFIER, "Expect superclass name.")
         Expr::Variable.new(previous)
       else
@@ -72,7 +72,7 @@ class Parser
     unless check(TokenType::RIGHT_PAREN)
       parameters << consume(TokenType::IDENTIFIER, "Expect parameter name.")
 
-      while match([TokenType::COMMA])
+      while match(TokenType::COMMA)
         if parameters.size >= 255
           error(peek, "Can't have more than 255 parameters.")
         end
@@ -93,7 +93,7 @@ class Parser
     name = consume(TokenType::IDENTIFIER, "Expect variable name.")
 
     initializer = nil
-    if match([TokenType::EQUAL])
+    if match(TokenType::EQUAL)
       initializer = expression
     end
 
@@ -102,27 +102,27 @@ class Parser
   end
 
   private def statement : Stmt
-    if match([TokenType::FOR])
+    if match(TokenType::FOR)
       return for_statement
     end
 
-    if match([TokenType::IF])
+    if match(TokenType::IF)
       return if_statement
     end
 
-    if match([TokenType::PRINT])
+    if match(TokenType::PRINT)
       return print_statement
     end
 
-    if match([TokenType::RETURN])
+    if match(TokenType::RETURN)
       return return_statement
     end
 
-    if match([TokenType::WHILE])
+    if match(TokenType::WHILE)
       return while_statement
     end
 
-    if match([TokenType::LEFT_BRACE])
+    if match(TokenType::LEFT_BRACE)
       return Stmt::Block.new(block)
     end
 
@@ -133,9 +133,9 @@ class Parser
     consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.")
 
     initializer =
-      if match([TokenType::SEMICOLON])
+      if match(TokenType::SEMICOLON)
         nil
-      elsif match([TokenType::VAR])
+      elsif match(TokenType::VAR)
         var_declaration
       else
         expression_statement
@@ -190,7 +190,7 @@ class Parser
 
     then_branch = statement
     else_branch = nil
-    if match([TokenType::ELSE])
+    if match(TokenType::ELSE)
       else_branch = statement
     end
 
@@ -236,7 +236,7 @@ class Parser
   private def assignment : Expr
     expr = or
 
-    if match([TokenType::EQUAL])
+    if match(TokenType::EQUAL)
       equals = previous
       value = assignment
 
@@ -259,7 +259,7 @@ class Parser
   private def or : Expr
     expr = and
 
-    while match([TokenType::OR])
+    while match(TokenType::OR)
       operator = previous
       right = and
       expr = Expr::Logical.new(expr, operator, right)
@@ -271,7 +271,7 @@ class Parser
   private def and : Expr
     expr = equality
 
-    while match([TokenType::AND])
+    while match(TokenType::AND)
       operator = previous
       right = equality
       expr = Expr::Logical.new(expr, operator, right)
@@ -342,9 +342,9 @@ class Parser
     expr = primary
 
     loop do
-      if match([TokenType::LEFT_PAREN])
+      if match(TokenType::LEFT_PAREN)
         expr = finish_call(expr)
-      elsif match([TokenType::DOT])
+      elsif match(TokenType::DOT)
         name = consume(TokenType::IDENTIFIER, "Expect property name after '.'.")
         expr = Expr::Get.new(expr, name)
       else
@@ -359,7 +359,7 @@ class Parser
     arguments = [] of Expr
     unless check(TokenType::RIGHT_PAREN)
       arguments << expression
-      while match([TokenType::COMMA])
+      while match(TokenType::COMMA)
         if arguments.size >= 255
           error(peek, "Can't have more than 255 arguments.")
         end
@@ -373,24 +373,24 @@ class Parser
   end
 
   private def primary : Expr
-    if match([TokenType::FALSE])
+    if match(TokenType::FALSE)
       Expr::Literal.new(false)
-    elsif match([TokenType::TRUE])
+    elsif match(TokenType::TRUE)
       Expr::Literal.new(true)
-    elsif match([TokenType::NIL])
+    elsif match(TokenType::NIL)
       Expr::Literal.new(nil)
     elsif match([TokenType::NUMBER, TokenType::STRING])
       Expr::Literal.new(previous.literal)
-    elsif match([TokenType::SUPER])
+    elsif match(TokenType::SUPER)
       keyword = previous
       consume(TokenType::DOT, "Expect '.' after 'super'.")
       method = consume(TokenType::IDENTIFIER, "Expect superclass method name.")
       Expr::Super.new(keyword, method)
-    elsif match([TokenType::THIS])
+    elsif match(TokenType::THIS)
       Expr::This.new(previous)
-    elsif match([TokenType::IDENTIFIER])
+    elsif match(TokenType::IDENTIFIER)
       Expr::Variable.new(previous)
-    elsif match([TokenType::LEFT_PAREN])
+    elsif match(TokenType::LEFT_PAREN)
       expr = expression
       consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.")
       Expr::Grouping.new(expr)
@@ -421,7 +421,15 @@ class Parser
     peek.type == TokenType::EOF
   end
 
-  # TODO: add match(TokenType) override
+  private def match(token_type : TokenType) : Bool
+    if check(token_type)
+      advance
+      return true
+    end
+
+    false
+  end
+
   private def match(token_types : Array(TokenType)) : Bool
     token_types.each do |token_type|
       if check(token_type)
