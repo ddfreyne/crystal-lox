@@ -16,6 +16,8 @@ class Interpreter
     @globals = Environment.new
 
     globals.define("clock", Callable::Builtin::Clock.new)
+    globals.define("getc", Callable::Builtin::Getc.new)
+    globals.define("chr", Callable::Builtin::Chr.new)
 
     @environment = globals
 
